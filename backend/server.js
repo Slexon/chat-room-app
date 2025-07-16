@@ -53,6 +53,11 @@ io.on('connection', (socket) => {
   });
 });
 
+// Health Check Endpoint für Docker
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
 // Starte Server
 const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));
