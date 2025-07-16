@@ -1,0 +1,59 @@
+# Node.js und npm
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json  # Oder yarn.lock, falls du Yarn nutzt (kommentiere aus, wenn du es tracken möchtest)
+.env  # Für sensible Daten wie API-Keys
+
+# Vite und React Builds
+dist/
+.vite/
+vite.config.js.timestamp-*
+
+# Logs und temporäre Dateien
+*.log
+*.tmp
+temp/
+tmp/
+
+# Editor- und IDE-spezifische Dateien
+.vscode/
+.idea/
+*.sublime*
+.DS_Store  # macOS
+Thumbs.db  # Windows
+ehthumbs.db  # Windows
+
+# OS-spezifische Dateien
+Desktop.ini  # Windows
+~$*  # Microsoft Office Temps
+
+# Build- und Cache-Dateien
+.cache/
+.eslintcache
+.parcel-cache
+.swc/
+
+# Test- und Coverage-Dateien
+coverage/
+.nyc_output
+
+# Deployment- und Prod-Dateien
+.vercel/  # Falls du Vercel nutzt
+.now/    # Ältere Vercel
+build/
+out/
+
+# Andere unnötige Dateien
+*.bak
+*.swp
+*.swo
+*~
+
+# Ignoriere nichts in diesen Ordnern, falls nötig (z. B. für Docs)
+# !.gitignore
+# !README.md
+
+# Projekt-spezifisch: Ignoriere lokale Configs, falls vorhanden
+frontend/dist/
+backend/logs/

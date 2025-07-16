@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-gray-100 font-sans antialiased;
+}
+
+.chat-container {
+  @apply min-h-screen flex items-center justify-center p-4;
+}
+
+.chat-header {
+  @apply p-4 bg-gradient-to-r from-blue-500 to-blue-700 text-white text-center font-bold relative rounded-t-xl shadow-md;
+}
+
+.chat-body {
+  @apply flex-1 p-4 overflow-y-auto bg-white;
+}
+
+.chat-bubble {
+  @apply p-3 rounded-lg max-w-md relative transition-all duration-200 ease-in-out;
+}
+
+.chat-bubble.self {
+  @apply bg-blue-500 text-white ml-auto;
+}
+
+.chat-bubble.other {
+  @apply bg-gray-200 text-black;
+}
+
+.chat-bubble:hover {
+  @apply shadow-md;
+}
+
+.avatar {
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-white font-bold mr-2 shadow;
+}
+
+.self .avatar {
+  @apply bg-blue-700 ml-2 order-last;
+}
+
+.other .avatar {
+  @apply bg-gray-500;
+}
+
+/* Fade-in Animation für Nachrichten */
+.message {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
