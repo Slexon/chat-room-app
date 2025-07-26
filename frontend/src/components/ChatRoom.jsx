@@ -4,7 +4,8 @@ import MessageInput from './MessageInput.jsx';
 import OnlineUsers from './OnlineUsers.jsx';
 import { showDesktopNotification, initializeNotifications } from '../utils/notificationManager.js';
 
-const socket = io('http://localhost:3001');
+// Socket.IO-Verbindung - automatische Erkennung der URL je nach Umgebung
+const socket = io(window.location.hostname === 'localhost' ? 'http://localhost:3001' : undefined);
 
 function ChatRoom({ username, room, onLeave }) {
   const [messages, setMessages] = useState([]);
