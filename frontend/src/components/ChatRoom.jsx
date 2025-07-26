@@ -4,8 +4,17 @@ import MessageInput from './MessageInput.jsx';
 import OnlineUsers from './OnlineUsers.jsx';
 import { showDesktopNotification, initializeNotifications } from '../utils/notificationManager.js';
 
-// Socket.IO-Verbindung - automatische Erkennung der URL je nach Umgebung
-const socket = io(window.location.hostname === 'localhost' ? 'http://localhost:3001' : undefined);
+// Socket.IO-Verbindung - konfiguriert für lokale Entwicklung und Produktion
+const getSocketUrl = () => {
+  // Für lokale Entwicklung
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:3001';
+  }
+  // Für Produktion auf Render.com
+  return import.meta.env.VITE_SOCKET_URL || 'https://chat-room-app-zg8q.onrender.com';
+};
+
+const socket = io(getSocketUrl());
 
 function ChatRoom({ username, room, onLeave }) {
   const [messages, setMessages] = useState([]);
