@@ -3,7 +3,14 @@ node_modules/
 npm-debug.log
 yarn-error.log
 package-lock.json  # Oder yarn.lock, falls du Yarn nutzt (kommentiere aus, wenn du es tracken möchtest)
-.env  # Für sensible Daten wie API-Keys
+
+# Environment Variables - NIEMALS in Git hochladen!
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+*.env
 
 # Vite und React Builds
 dist/
