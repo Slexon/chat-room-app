@@ -1,63 +1,107 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const { connectDB, User } = require('./database');
+const { initializeFeatures } = require('./features');
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: '*' } // Für lokale Entwicklung; passe für Prod an
+  cors: { origin: '*' }
 });
 
-// In-Memory-Speicher: Objekt mit Rooms und deren History
-const rooms = {};
+// Set zur Speicherung aktiver User-Sessions global
+const activeUsers = new Set();
+const featureHandler = initializeFeatures(io);
 
 // Socket-Logik
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
+  // Binde Feature-Logik an den Socket
+  featureHandler(socket);
 
   // Beitreten zu einem Room
-  socket.on('join', ({ username, room }) => {
-    if (!username || !room) return; // Einfache Validierung
-    socket.join(room);
-    socket.username = username; // Speichere Username am Socket
+  socket.on('join', async ({ username, room }) => {
+    if (!username || !room) return;
 
-    socket.on('leave', ({ username, room }) => {
-  if (username && room) {
-    io.to(room).emit('message', { user: 'System', text: `${username} hat den Room verlassen.` });
-    socket.leave(room);
-  }});
+    if (activeUsers.has(username)) {
+      socket.emit('error', { message: `Username "${username}" ist bereits vergeben.` });
+      return;
+    }
 
-    // Initialisiere Room, falls neu
-    if (!rooms[room]) rooms[room] = [];
+    try {
+      const [user] = await User.findOrCreate({
+        where: { username },
+        defaults: { username },
+      });
 
-    // Broadcast: User joined
-    io.to(room).emit('message', { user: 'System', text: `${username} ist beigetreten.` });
+      if (!user) {
+        socket.emit('error', { message: 'Konnte User nicht erstellen oder finden.' });
+        return;
+      }
 
-    // Sende Chat-History an neuen User
-    socket.emit('history', rooms[room]);
+      activeUsers.add(username);
+      socket.join(room);
+      socket.username = username;
+      socket.currentRoom = room;
+
+      // Fügt User zur Raumliste im Feature-Modul hinzu
+      socket.addUserToRoom(username, room);
+
+      // Sende Chat-History mit Zeitstempeln aus dem Feature-Modul
+      const history = await socket.getHistory(room);
+      socket.emit('history', history);
+
+      io.to(room).emit('message', { user: 'System', text: `${username} ist beigetreten.` });
+
+    } catch (error) {
+      console.error('Fehler beim Join:', error);
+      socket.emit('error', { message: 'Serverfehler beim Beitreten.' });
+    }
   });
 
   // Nachricht senden
-  socket.on('message', ({ room, text }) => {
-    if (!text || !room || !socket.username) return; // Validierung
-    const sanitizedText = text.replace(/<[^>]*>/g, ''); // Basisschutz gegen XSS
-
-    const message = { user: socket.username, text: sanitizedText };
-    rooms[room].push(message); // Speichere in History
-
-    io.to(room).emit('message', message); // Broadcast
+  socket.on('message', async ({ room, text }) => {
+    if (!text || !room || !socket.username) return;
+    
+    try {
+      // Erstellt Nachricht mit Zeitstempel über das Feature-Modul
+      const message = await socket.createMessage({ room, text });
+      io.to(room).emit('message', message);
+    } catch (error) {
+      console.error('Fehler beim Senden der Nachricht:', error);
+    }
   });
 
-  // Disconnect
-  socket.on('disconnect', () => {
+  // Disconnect-Logik
+  const handleDisconnect = () => {
+    if (socket.username) {
+      activeUsers.delete(socket.username);
+      io.to(socket.currentRoom).emit('message', {
+        user: 'System',
+        text: `${socket.username} hat den Room verlassen.`,
+      });
+      console.log(`${socket.username} disconnected and was removed from active users.`);
+    }
+    // Die Feature-spezifische Cleanup-Logik wird durch den 'disconnect'-Listener
+    // in features.js automatisch gehandhabt.
     console.log('User disconnected:', socket.id);
-  });
+  };
+
+  socket.on('leave', handleDisconnect);
+  socket.on('disconnect', handleDisconnect);
 });
 
-// Health Check Endpoint für Docker
+// Health Check Endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Starte Server
-const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));
+// Starte Server nach DB-Verbindung
+const startServer = async () => {
+  await connectDB();
+  const PORT = process.env.PORT || 3001;
+  server.listen(PORT, () => console.log(`🚀 Server läuft auf Port ${PORT}`));
+};
+
+startServer();

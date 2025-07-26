@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function MessageInput({ onSend }) {
+function MessageInput({ onSend, onTyping }) {
   const [text, setText] = useState('');
 
   const handleSubmit = (e) => {
@@ -11,16 +11,23 @@ function MessageInput({ onSend }) {
     }
   };
 
+  const handleChange = (e) => {
+    setText(e.target.value);
+    if (onTyping) {
+      onTyping();
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="p-4 border-t flex bg-white rounded-b-xl shadow-top">
+    <form onSubmit={handleSubmit} className="flex bg-white">
       <input
         type="text"
         value={text}
-        onChange={(e) => setText(e.target.value)}
+        onChange={handleChange}
         placeholder="Nachricht eingeben..."
-        className="flex-1 border p-2 rounded-l-md focus:outline-none focus:border-blue-500"
+        className="flex-1 border-t p-4 focus:outline-none"
       />
-      <button type="submit" className="bg-blue-500 text-white p-2 rounded-r-md hover:bg-blue-600 transition-all">Senden</button>
+      <button type="submit" className="bg-blue-500 text-white px-6 py-4 hover:bg-blue-600 transition-all font-bold">Senden</button>
     </form>
   );
 }

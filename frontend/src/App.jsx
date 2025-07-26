@@ -12,17 +12,16 @@ function App() {
     setUsername(user);
     setRoom(rm);
     setInRoom(true);
-    console.log('Joining room:', rm, 'as', user);
   };
 
   const handleLeave = () => {
     setInRoom(false);
-    setRoom(''); // Optional: Reset Room für Sicherheit
-    console.log('Left room');
+    setUsername(''); // Wichtig: Username zurücksetzen
+    setRoom('');
   };
 
   return (
-    <div className="chat-container">
+    <div className="flex justify-center items-center h-screen bg-gray-200">
       {inRoom ? (
         <ChatRoom username={username} room={room} onLeave={handleLeave} />
       ) : (
