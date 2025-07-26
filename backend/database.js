@@ -1,17 +1,40 @@
 const { Sequelize, DataTypes } = require('sequelize');
 require('dotenv').config();
 
-// Database Connection
-const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASSWORD,
-  {
-    host: process.env.DB_HOST,
+// Debug: Log environment variables (remove in production)
+console.log('🔍 Environment Debug:');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+console.log('PORT:', process.env.PORT);
+
+// Database Connection - Unterstützt sowohl einzelne Variablen als auch DATABASE_URL
+let sequelize;
+
+if (process.env.DATABASE_URL) {
+  // Für Render.com und andere Cloud-Anbieter mit DATABASE_URL
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
-    logging: false, // Set to true to see SQL queries
-  }
-);
+    logging: false,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
+    }
+  });
+} else {
+  // Für lokale Entwicklung mit einzelnen Variablen
+  sequelize = new Sequelize(
+    process.env.DB_NAME,
+    process.env.DB_USER,
+    process.env.DB_PASSWORD,
+    {
+      host: process.env.DB_HOST,
+      dialect: 'postgres',
+      logging: false,
+    }
+  );
+}
 
 // Define Models
 const User = sequelize.define('User', {
