@@ -73,16 +73,17 @@ function initializeFeatures(io) {
     };
 
     // Hilfsfunktion zum Erstellen einer Nachricht mit Zeitstempel
-    socket.createMessage = async ({ room, text }) => {
+    socket.createMessage = async ({ room, text, author }) => {
       const sanitizedText = text.replace(/<[^>]*>/g, '');
-      await Message.create({
+      const messageData = {
         content: sanitizedText,
         room,
-        author: socket.username,
-      });
+        author: author,
+      };
+      await Message.create(messageData);
       // Sende Nachricht mit Zeitstempel
       return { 
-        user: socket.username, 
+        user: author, 
         text: sanitizedText, 
         timestamp: new Date() // Feature: Zeitstempel
       };

@@ -4,7 +4,17 @@ import MessageInput from './MessageInput.jsx';
 import OnlineUsers from './OnlineUsers.jsx';
 import { showDesktopNotification, initializeNotifications } from '../utils/notificationManager.js';
 
-const socket = io('http://localhost:3001');
+// Socket.IO-Verbindung - konfiguriert für lokale Entwicklung und Produktion
+const getSocketUrl = () => {
+  // Für lokale Entwicklung
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:3001';
+  }
+  // Für Produktion - verwende Environment Variable
+  return import.meta.env.VITE_SOCKET_URL || 'https://your-backend-service.onrender.com';
+};
+
+const socket = io(getSocketUrl());
 
 function ChatRoom({ username, room, onLeave }) {
   const [messages, setMessages] = useState([]);
