@@ -1,12 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 require('dotenv').config();
 
-// Debug: Log environment variables (remove in production)
-console.log('🔍 Environment Debug:');
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
-console.log('PORT:', process.env.PORT);
-
 // Database Connection - Unterstützt sowohl einzelne Variablen als auch DATABASE_URL
 let sequelize;
 

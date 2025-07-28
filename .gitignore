@@ -12,6 +12,22 @@ package-lock.json  # Oder yarn.lock, falls du Yarn nutzt (kommentiere aus, wenn 
 .env.test
 *.env
 
+# Sensitive configuration files
+config/secrets.json
+config/production.json
+*.key
+*.pem
+*.crt
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs with potentially sensitive data
+*.log
+logs/
+
 # Vite und React Builds
 dist/
 .vite/
