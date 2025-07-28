@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import MessageInput from './MessageInput.jsx';
 import OnlineUsers from './OnlineUsers.jsx';
+import ChatHistory from './ChatHistory.jsx';
+import FavoriteButton from './FavoriteButton.jsx';
 import { showDesktopNotification, initializeNotifications } from '../utils/notificationManager.js';
 
 // Socket.IO-Verbindung - konfiguriert für lokale Entwicklung und Produktion
@@ -20,6 +22,7 @@ function ChatRoom({ username, room, onLeave }) {
   const [messages, setMessages] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [typingUser, setTypingUser] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
@@ -109,7 +112,19 @@ function ChatRoom({ username, room, onLeave }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            ChatRoom: {room}
+            <span>ChatRoom: {room}</span>
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex gap-2">
+              <button
+                onClick={() => setShowHistory(true)}
+                className="text-white hover:text-gray-200 focus:outline-none hover:scale-110 transition-all"
+                aria-label="Chat-Historie anzeigen"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </button>
+              <FavoriteButton username={username} room={room} />
+            </div>
           </div>
           <div className="chat-body">
             {messages.map((msg, idx) => (
@@ -138,6 +153,13 @@ function ChatRoom({ username, room, onLeave }) {
           </div>
         </div>
       </div>
+      {showHistory && (
+        <ChatHistory
+          username={username}
+          room={room}
+          onClose={() => setShowHistory(false)}
+        />
+      )}
     </div>
   );
 }

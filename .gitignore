@@ -11,6 +11,20 @@ package-lock.json  # Oder yarn.lock, falls du Yarn nutzt (kommentiere aus, wenn 
 .env.production
 .env.test
 *.env
+# Build output
+frontend/dist/
+backend/dist/
+# Environment files
+.env
+frontend/.env
+backend/.env
+# Logs
+*.log
+# IDE
+.vscode/
+# System
+.DS_Store
+Thumbs.db
 
 # Sensitive configuration files
 config/secrets.json
