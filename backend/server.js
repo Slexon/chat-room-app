@@ -1,14 +1,25 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const cors = require('cors'); // Importiere cors
 const { connectDB, User } = require('./database');
 const { initializeFeatures } = require('./features');
+const routes = require('./routes');
 
 const app = express();
+
+// CORS Middleware für alle Routen
+app.use(cors({
+  origin: 'http://localhost:5173' // Erlaube Anfragen vom Frontend
+}));
+
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: '*' }
+  cors: { origin: 'http://localhost:5173' } // Spezifiziere auch hier die Origin
 });
+
+// API Routes
+app.use(routes);
 
 // Set zur Speicherung aktiver User-Sessions global
 const activeUsers = new Set();
@@ -66,7 +77,7 @@ io.on('connection', (socket) => {
     
     try {
       // Erstellt Nachricht mit Zeitstempel über das Feature-Modul
-      const message = await socket.createMessage({ room, text });
+      const message = await socket.createMessage({ room, text, author: socket.username });
       io.to(room).emit('message', message);
     } catch (error) {
       console.error('Fehler beim Senden der Nachricht:', error);
