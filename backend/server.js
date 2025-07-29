@@ -10,12 +10,23 @@ const app = express();
 
 // CORS Middleware für alle Routen
 app.use(cors({
-  origin: 'http://localhost:5173' // Erlaube Anfragen vom Frontend
+  origin: [
+    'https://chat-room-frontend-4vig.onrender.com',
+    'http://localhost:5173'
+  ],
+  credentials: true
 }));
 
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: 'http://localhost:5173' } // Spezifiziere auch hier die Origin
+  cors: {
+    origin: [
+      'https://chat-room-frontend-4vig.onrender.com',
+      'http://localhost:5173'
+    ],
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
 });
 
 // API Routes
